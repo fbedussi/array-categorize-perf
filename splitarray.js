@@ -6,7 +6,7 @@ const {
 
 const obs = new PerformanceObserver((items) => {
     console.log(items.getEntries()[0].name, items.getEntries()[0].duration);
-    performance.clearMarks();
+    performance.clearMarks();new Array(NUMBER_OF_BIRTHS)
 });
 obs.observe({ entryTypes: ['measure'] });
 
@@ -47,28 +47,28 @@ function addSample(samples, sample) {
     return samples;
 }
 
-function splitArrayNormal(data) {
-    performance.mark('startSpliltArrayNormal');
-console.log('data Length', data.length);
+function splitArray1(data) {
+    performance.mark('startSpliltArray1');
+    console.log('data Length', data.length);
     let results = [];
     for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
         results[i] = data.reduce((birthSamples, sample) => {
             if (sample.birthId === i) {
                 birthSamples.push(sample);
-            } 
+            }
             return birthSamples;
         }, []);
-        console.log(`n. of result ID ${i}`,results[i].length);
+        console.log(`n. of result ID ${i}`, results[i].length);
     }
 
-    performance.mark('stopSplitArrayNormal');
-    performance.measure('splitArrayNormal', 'startSplitArrayNormal', 'stopSplitArrayNormal');
+    performance.mark('stopSplitArray1');
+    performance.measure('splitArray1', 'startSplitArray1', 'stopSplitArray1');
 }
 
 
-function splitArrayDecrement(data) {
-    performance.mark('startSpliltArrayDecrement');
-console.log('data Length',data.length);
+function splitArray2(data) {
+    performance.mark('startSpliltArray2');
+    console.log('data Length', data.length);
 
     let results = [];
     for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
@@ -92,18 +92,18 @@ console.log('data Length',data.length);
         data = splitResult.remainingData;
     }
 
-    performance.mark('stopSplitArrayDecrement');
-    performance.measure('splitArrayDecrement', 'startSplitArrayDecrement', 'stopSplitArrayDecrement');
+    performance.mark('stopSplitArray2');
+    performance.measure('splitArray2', 'startSplitArray2', 'stopSplitArray2');
 }
 
 
 function splitArray3(data) {
     performance.mark('startSpliltArray3');
-console.log('data Length', data.length);
+    console.log('data Length', data.length);
     let results = [];
     for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
         results[i] = data.filter((sample) => sample.birthId === i);
-        console.log(`n. of result ID ${i}`,results[i].length);
+        console.log(`n. of result ID ${i}`, results[i].length);
     }
 
     performance.mark('stopSplitArray3');
@@ -115,24 +115,49 @@ console.log('data Length', data.length);
 function splitArray4(data) {
     performance.mark('startSpliltArray4');
     console.log('data Length', data.length);
-    let results git@github.com:fbedussi/array-categorize-perf.git= [new Array(data.lenght),new Array(data.lenght),new Array(data.lenght),new Array(data.lenght),new Array(data.lenght),new Array(data.lenght)];
+    //let results = [new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length)];
+    let results = [];
+    for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
+        results[i] = [];
+    }
     for (let i = 0; i < data.length; i++) {
         const sample = data[i];
         results[sample.birthId][i] = sample;
     }
-    results.forEach((result, i) => console.log(`n. of result ID ${i}`,result.length));
-    
+    results.forEach((result, i) => console.log(`n. of result ID ${i}`, result.length));
+
     performance.mark('stopSplitArray4');
     performance.measure('splitArray4', 'startSplitArray4', 'stopSplitArray4');
+}
+
+function splitArray5(data) {
+    performance.mark('startSpliltArray5');
+    console.log('data Length', data.length);
+    let results = [new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length)];
+    for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
+        results[i] = [];
+    }
+    for (let i = 0; i < data.length; i++) {
+        const sample = data[i];
+        results[sample.birthId][i] = sample;
+    }
+    results.forEach((result, i) => {
+        reuslt = result.filter((x) => x);
+        console.log(`n. of result ID ${i}`, result.length)
+    });
+
+    performance.mark('stopSplitArray5');
+    performance.measure('splitArray5', 'startSplitArray5', 'stopSplitArray5');
 }
 
 
 
 const toRun = {
-    "1": () => splitArrayNormal(data.slice()),
-    "2": () => splitArrayDecrement(data.slice()),   
+    "1": () => splitArray1(data.slice()),
+    "2": () => splitArray2(data.slice()),
     "3": () => splitArray3(data.slice()),
-    "4": () => splitArray4(data.slice()), 
+    "4": () => splitArray4(data.slice()),
+    "5": () => splitArray5(data.slice()),
 }
 
 const selectedArgotithm = process.argv[2];
