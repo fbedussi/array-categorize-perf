@@ -1,4 +1,3 @@
-const fs = require('fs');
 const {
     performance,
     PerformanceObserver,
@@ -6,30 +5,27 @@ const {
 
 const obs = new PerformanceObserver((items) => {
     console.log(items.getEntries()[0].name, items.getEntries()[0].duration);
-    performance.clearMarks();new Array(NUMBER_OF_BIRTHS)
+    performance.clearMarks();new Array(NUMBER_OF_CATEGORIES)
 });
 obs.observe({ entryTypes: ['measure'] });
 
-var fakeDilatation = 100;
 const EIGHT_HOURS = 1000 * 60 * 60 * 8;
-const NUMBER_OF_BIRTHS = 5;
+const NUMBER_OF_CATEGORIES = 5;
 const SAMPLING_INTERVAL = 1000;
 
-function updateAndGetFakeDilatation() {
-    fakeDilatation = fakeDilatation + Math.random();
-
-    return fakeDilatation;
+function getFakeData() {
+    return Math.trunc(Math.random() * 1000);
 }
 
-function getFakeBirthId() {
-    return Math.trunc(Math.random() * NUMBER_OF_BIRTHS)
+function getFakeCategoryId() {
+    return Math.trunc(Math.random() * NUMBER_OF_CATEGORIES)
 }
 
 function getFakeSample(timestamp) {
     return {
-        birthId: getFakeBirthId(),
+        categoryId: getFakeCategoryId(),
         timestamp,
-        dilatation: updateAndGetFakeDilatation(),
+        data: getFakeData(),
     }
 }
 
@@ -37,26 +33,21 @@ let data = [];
 const startTime = Date.now();
 
 for (let timestamp = startTime; timestamp < startTime + EIGHT_HOURS; timestamp += SAMPLING_INTERVAL) {
-    for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
+    for (let i = 0; i < NUMBER_OF_CATEGORIES; i++) {
         data.push(getFakeSample(timestamp));
     }
-}
-
-function addSample(samples, sample) {
-    samples.push([sample.timestamp, sample.dilatation]);
-    return samples;
 }
 
 function splitArray1(data) {
     performance.mark('startSpliltArray1');
     console.log('data Length', data.length);
     let results = [];
-    for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
-        results[i] = data.reduce((birthSamples, sample) => {
-            if (sample.birthId === i) {
-                birthSamples.push(sample);
+    for (let i = 0; i < NUMBER_OF_CATEGORIES; i++) {
+        results[i] = data.reduce((categorySamples, sample) => {
+            if (sample.categoryId === i) {
+                categorySamples.push(sample);
             }
-            return birthSamples;
+            return categorySamples;
         }, []);
         console.log(`n. of result ID ${i}`, results[i].length);
     }
@@ -71,9 +62,9 @@ function splitArray2(data) {
     console.log('data Length', data.length);
 
     let results = [];
-    for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
+    for (let i = 0; i < NUMBER_OF_CATEGORIES; i++) {
         const splitResult = data.reduce((reduceResult, sample) => {
-            if (sample.birthId === i) {
+            if (sample.categoryId === i) {
                 reduceResult.selectedData.push(sample);
             } else {
                 reduceResult.remainingData.push(sample)
@@ -101,8 +92,8 @@ function splitArray3(data) {
     performance.mark('startSpliltArray3');
     console.log('data Length', data.length);
     let results = [];
-    for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
-        results[i] = data.filter((sample) => sample.birthId === i);
+    for (let i = 0; i < NUMBER_OF_CATEGORIES; i++) {
+        results[i] = data.filter((sample) => sample.categoryId === i);
         console.log(`n. of result ID ${i}`, results[i].length);
     }
 
@@ -115,14 +106,13 @@ function splitArray3(data) {
 function splitArray4(data) {
     performance.mark('startSpliltArray4');
     console.log('data Length', data.length);
-    //let results = [new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length)];
     let results = [];
-    for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
+    for (let i = 0; i < NUMBER_OF_CATEGORIES; i++) {
         results[i] = [];
     }
     for (let i = 0; i < data.length; i++) {
         const sample = data[i];
-        results[sample.birthId][i] = sample;
+        results[sample.categoryId][i] = sample;
     }
     results.forEach((result, i) => console.log(`n. of result ID ${i}`, result.length));
 
@@ -134,12 +124,12 @@ function splitArray5(data) {
     performance.mark('startSpliltArray5');
     console.log('data Length', data.length);
     let results = [new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length), new Array(data.length)];
-    for (let i = 0; i < NUMBER_OF_BIRTHS; i++) {
+    for (let i = 0; i < NUMBER_OF_CATEGORIES; i++) {
         results[i] = [];
     }
     for (let i = 0; i < data.length; i++) {
         const sample = data[i];
-        results[sample.birthId][i] = sample;
+        results[sample.categoryId][i] = sample;
     }
     results.forEach((result, i) => {
         reuslt = result.filter((x) => x);
@@ -152,7 +142,7 @@ function splitArray5(data) {
 
 
 
-const toRun = {
+const run = {
     "1": () => splitArray1(data.slice()),
     "2": () => splitArray2(data.slice()),
     "3": () => splitArray3(data.slice()),
@@ -160,6 +150,6 @@ const toRun = {
     "5": () => splitArray5(data.slice()),
 }
 
-const selectedArgotithm = process.argv[2];
+const selectedAlgorithm = process.argv[2];
 
-toRun[selectedArgotithm]();
+run[selectedAlgorithm]();
